@@ -1,6 +1,6 @@
-from pydantic import BaseModel, conlist, ValidationError#, List
-from strictyaml import YAML, load, Map, Float, Seq, Str, YAMLError
-import strictyaml as sy
+from pydantic import BaseModel, conlist, ValidationError
+from strictyaml import YAML, load,YAMLError
+# import strictyaml as sy
 from typing import Optional
 from pathlib import Path
 
@@ -16,8 +16,7 @@ class CarsData(BaseModel):
     listCar : list[CarData]
 
 
-
-def load_car_data(filename:Optional[Path]="car_data.yaml") -> YAML:
+def load_car_data(filename:Path="car_data.yaml") -> YAML:
     with open(filename, "r") as file:
         try:
             yaml_data = load(file.read())
@@ -27,13 +26,11 @@ def load_car_data(filename:Optional[Path]="car_data.yaml") -> YAML:
         except ValidationError as e:
             print(f"Data validation error: {e}")
 
-def validate_config(parsed_config: YAML=None) -> CarsData:
+def validate_config(parsed_config: YAML=None) -> Optional[CarsData]:
     if parsed_config is None:
         print("Parsed config is None")
         return None
-    # _config = CarsData(
-    #     **parsed_config.data
-    # )
+
     try:
         # Convert YAML data into CarsData model
         car_list_data = [CarData(**item) for item in parsed_config.data]
@@ -41,10 +38,6 @@ def validate_config(parsed_config: YAML=None) -> CarsData:
     except ValidationError as e:
         print(f"Data validation error: {e}")
         return None
-    return _config
-
-
-
 
 def calculate_volume(length, width, height):
     return length * width * height
@@ -53,8 +46,6 @@ def calculate_average_fuel_efficiency(fuel_efficiency):
     return sum(fuel_efficiency) / len(fuel_efficiency)
 
 def main():
-    # car_data = load_car_data()
-    # print(type(car_data))
     car_data = validate_config(load_car_data())
     
     if car_data is None:
